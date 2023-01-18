@@ -48,7 +48,7 @@ public:
         : is_some_(other.is_some_)
     {
         if (is_some_) {
-            value.construct(cxxstd::forward<T>(other.value.assume_init()));
+            value.construct(cxxstd::move<T>(other.value.assume_init()));
             other.value.destruct();
             other.is_some_ = false;
         }
@@ -84,26 +84,33 @@ public:
         return *this;
     }
 
-    bool is_some() const {
+    constexpr bool is_some() const {
         return is_some_;
     }
 
-    bool is_none() const {
+    constexpr bool is_none() const {
         return !is_some_;
     }
 
-    T &unwrap() {
+    T &unwrap() & {
         if (!is_some_) {
             panic();
         }
         return value.assume_init();
     }
 
-    const T &unwrap() const {
+    const T &unwrap() const & {
         if (!is_some_) {
             panic();
         }
         return value.assume_init();
+    }
+
+    T &&unwrap() && {
+        if (!is_some_) {
+            panic();
+        }
+        return cxxstd::move(value.assume_init());
     }
 
     bool operator ==(const Option &other) const {
@@ -125,6 +132,11 @@ public:
 }
 
 using core::option::Option;
+
+template <typename T>
+Option<T> Some(const T &value) {
+    return Option<T>(value);
+}
 
 template <typename T>
 Option<T> Some(T &&value) {

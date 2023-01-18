@@ -24,7 +24,7 @@ private:
 
     Slice(const T *data, usize length)
         : data(data), length(length)
-    {}
+    { }
 
 public:
     usize len() const {
@@ -75,7 +75,7 @@ public:
         if (index >= length) {
             return None;
         } else {
-            return Some(data[index]);
+            return Some<const T &>(data[index]);
         }
     }
 
@@ -191,7 +191,7 @@ public:
         }
         const T &first = slice[0];
         slice = Slice<T>::from_raw_parts(slice.as_ptr() + 1, slice.len() - 1);
-        return Some(first);
+        return Some<const T &>(first);
     }
 };
 

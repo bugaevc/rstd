@@ -3,3 +3,9 @@ test('test-slice', test_slice)
 
 test_vec = executable('test-vec', 'test-vec.cpp', dependencies: rstd)
 test('test-vec', test_vec)
+
+test_io = executable('test-io', 'test-io.cpp', dependencies: rstd)
+test('test-io', test_io)
+
+test_tuple = executable('test-tuple', 'test-tuple.cpp', dependencies: rstd)
+test('test-tuple', test_tuple)

@@ -16,6 +16,8 @@ private:
         E error;
     };
 
+    Result() { }
+
 public:
     ~Result() {
         if (is_ok_) {
@@ -23,6 +25,32 @@ public:
         } else {
             error.~E();
         }
+    }
+
+    Result(Result &&other)
+        : is_ok_(other.is_ok_)
+    {
+        if (is_ok_) {
+            new(&success) T(cxxstd::move(other.success));
+        } else {
+            new(&error) E(cxxstd::move(other.error));
+        }
+    }
+
+    template<typename U>
+    constexpr static Result Ok(U &&value) {
+        Result res;
+        res.is_ok_ = true;
+        new(&res.success) T(cxxstd::forward<U>(value));
+        return res;
+    }
+
+    template<typename U>
+    constexpr static Result Err(U &&err) {
+        Result res;
+        res.is_ok_ = false;
+        new(&res.error) E(cxxstd::forward<U>(err));
+        return res;
     }
 
     constexpr bool is_ok() const {
@@ -33,32 +61,46 @@ public:
         return !is_ok_;
     }
 
-    T &unwrap() {
+    T &unwrap() & {
         if (!is_ok_) {
             panic();
         }
         return success;
     }
 
-    const T &unwrap() const {
+    const T &unwrap() const & {
         if (!is_ok_) {
             panic();
         }
         return success;
     }
 
-    E &unwrap_err() {
+    T &&unwrap() && {
+        if (!is_ok_) {
+            panic();
+        }
+        return cxxstd::move(success);
+    }
+
+    E &unwrap_err() & {
         if (is_ok_) {
             panic();
         }
         return error;
     }
 
-    const E &unwrap_err() const {
+    const E &unwrap_err() const & {
         if (is_ok_) {
             panic();
         }
         return error;
+    }
+
+    E &&unwrap_err() && {
+        if (is_ok_) {
+            panic();
+        }
+        return cxxstd::move(error);
     }
 
     template<typename F>
@@ -84,4 +126,16 @@ public:
 }
 
 using core::result::Result;
+
+template<typename T, typename E, typename U>
+constexpr static Result<T, E> Ok(U &&value) {
+    return Result<T, E>::Ok(core::cxxstd::forward<U>(value));
 }
+
+template<typename T, typename E, typename U>
+constexpr static Result<T, E> Err(U &&err) {
+    return Result<T, E>::Err(core::cxxstd::forward<U>(err));
+}
+
+}
+

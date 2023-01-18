@@ -20,6 +20,7 @@ typedef double f64;
 
 namespace rstd {
 namespace core {
+
 constexpr usize next_power_of_two(usize self) {
     if (self <= 1) {
         return 1;

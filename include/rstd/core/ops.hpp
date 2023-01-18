@@ -12,11 +12,24 @@ template<typename Idx>
 struct Range {
     Idx start;
     Idx end;
+
+    Range() = delete;
+
+    Range(Idx start, Idx end)
+        : start(start)
+        , end(end)
+    { }
 };
 
 template<typename Idx>
 struct RangeFrom {
     Idx start;
+
+    RangeFrom() = delete;
+
+    RangeFrom(Idx start)
+        : start(start)
+    { }
 };
 
 }

@@ -12,11 +12,18 @@ private:
     RawFd fd;
 
 public:
-    OwnedFd(RawFd fd)
+    explicit OwnedFd(RawFd fd)
         : fd(fd)
     { }
 
+    OwnedFd(OwnedFd &) = delete;
+    OwnedFd(OwnedFd &&);
+
     ~OwnedFd();
+
+    RawFd as_raw_fd() const {
+        return fd;
+    }
 };
 
 }
