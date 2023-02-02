@@ -93,7 +93,7 @@ public:
             if (nread == 0) {
                 return Err<UnitType, Error>(Error(ErrorKind::UnexpectedEof));
             }
-            buf = buf[core::ops::RangeFrom(nread)];
+            buf = buf[core::ops::RangeFrom<usize>(nread)];
         }
 
         return Ok<UnitType, Error>(Unit);

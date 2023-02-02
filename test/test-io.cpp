@@ -16,7 +16,7 @@ void print_str(Slice<u8> str) {
 
 int main() {
     File file = File::open("/etc/fstab").unwrap();
-    BufReader br { core::cxxstd::move(file) };
+    BufReader<File> br { core::cxxstd::move(file) };
     Vec<u8> line;
     while (true) {
         usize res = br.read_line(line).unwrap();

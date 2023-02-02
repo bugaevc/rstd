@@ -48,7 +48,7 @@ public:
         : is_some_(other.is_some_)
     {
         if (is_some_) {
-            value.construct(cxxstd::move<T>(other.value.assume_init()));
+            value.construct((T &&) other.value.assume_init());
             other.value.destruct();
             other.is_some_ = false;
         }
@@ -77,7 +77,7 @@ public:
         }
         is_some_ = other.is_some_;
         if (is_some_) {
-            value.construct(cxxstd::move(other.value.assume_init()));
+            value.construct((T &&) other.value.assume_init());
             other.value.destruct();
             other.is_some_ = false;
         }
@@ -110,7 +110,7 @@ public:
         if (!is_some_) {
             panic();
         }
-        return cxxstd::move(value.assume_init());
+        return (T &&) value.assume_init();
     }
 
     bool operator ==(const Option &other) const {
