@@ -21,9 +21,9 @@
 #define try(res) ({ \
     auto __res = (res); \
     if (__res.is_err()) { \
-        return Err(__res.unwrap_err()); \
+        return rstd::Err(rstd::core::cxxstd::move(__res).unwrap_err()); \
     } \
-    __res.unwrap(); \
+    rstd::core::cxxstd::move(__res).unwrap(); \
 })
 
 #ifndef __has_cpp_attribute
