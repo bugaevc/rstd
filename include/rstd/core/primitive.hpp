@@ -21,6 +21,19 @@ typedef double f64;
 namespace rstd {
 namespace core {
 
+class Never {
+private:
+    Never() {
+        __builtin_abort();
+    }
+
+public:
+    template<typename T>
+    operator T() const {
+        __builtin_abort();
+    }
+};
+
 constexpr usize next_power_of_two(usize self) {
     if (self <= 1) {
         return 1;

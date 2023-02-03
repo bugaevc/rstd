@@ -1,10 +1,11 @@
 #include <rstd/core/panicking.hpp>
+#include <rstd/core/primitive.hpp>
 
 namespace rstd {
 namespace core {
 namespace panicking {
 
-void panic(void) {
+Never panic(void) {
     throw "Panic!";
 }
 

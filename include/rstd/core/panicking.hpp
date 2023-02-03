@@ -1,9 +1,12 @@
 namespace rstd {
 namespace core {
+
+class Never;
+
 namespace panicking {
 
  __attribute__((noreturn))
-void panic(void);
+Never panic(void);
 
 }
 }
