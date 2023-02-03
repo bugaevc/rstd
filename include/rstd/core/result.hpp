@@ -2,7 +2,9 @@
 
 #include <rstd/core/cxxstd.hpp>
 #include <rstd/core/panicking.hpp>
+#include <rstd/core/primitive.hpp>
 #include <rstd/core/macros.hpp>
+#include <rstd/core/mem/maybe-uninit.hpp>
 
 namespace rstd {
 namespace core {
@@ -123,20 +125,129 @@ public:
     }
 };
 
+template<typename T>
+class must_use Result<T, Never> {
+private:
+    T success;
+
+public:
+    template<typename U>
+    constexpr static Result Ok(U &&value) {
+        mem::MaybeUninit<Result> res;
+        new(res.as_bytes()) T(cxxstd::forward<U>(value));
+        return cxxstd::move(res.assume_init());
+    }
+
+    constexpr bool is_ok() const {
+        return true;
+    }
+
+    constexpr bool is_err() const {
+        return false;
+    }
+
+    T &unwrap() & {
+        return success;
+    }
+
+    const T &unwrap() const & {
+        return success;
+    }
+
+    T &&unwrap() && {
+        return (T &&) success;
+    }
+
+    Never unwrap_err() const {
+        return panic();
+    }
+
+    template<typename F>
+    Result<typename cxxstd::invoke_result<F, T>::type, Never> map(F f) {
+        return Ok(f(success));
+    }
+
+    template<typename F>
+    Result<T, Never> map_err(F f) {
+        return *this;
+    }
+
+    // Support for implicitly converting Ok(val) from Result<T, Never> into
+    // Result<T, E>.
+    template<typename E>
+    operator Result<T, E>() && {
+        return Result<T, E>::Ok((T &&) success);
+    }
+};
+
+template<typename E>
+class must_use Result<Never, E> {
+private:
+    E error;
+
+public:
+    template<typename U>
+    constexpr static Result Err(U &&err) {
+        mem::MaybeUninit<Result> res;
+        new(res.as_bytes()) E(cxxstd::forward<U>(err));
+        return cxxstd::move(res.assume_init());
+    }
+
+    constexpr bool is_ok() const {
+        return false;
+    }
+
+    constexpr bool is_err() const {
+        return true;
+    }
+
+    Never unwrap() const {
+        return panic();
+    }
+
+    E &unwrap_err() & {
+        return error;
+    }
+
+    const E &unwrap_err() const & {
+        return error;
+    }
+
+    E &&unwrap_err() && {
+        return (E &&) error;
+    }
+
+    template<typename F>
+    Result<Never, E> map(F f) {
+        return *this;
+    }
+
+    template<typename F>
+    Result<Never, typename cxxstd::invoke_result<F, E>::type> map_err(F f) {
+        return Err(f(error));
+    }
+
+    // Support for implicitly converting Err(err) from Result<Never, E> into
+    // Result<T, E>.
+    template<typename T>
+    operator Result<T, E>() && {
+        return Result<T, E>::Err((E &&) error);
+    }
+};
+
 }
 }
 
 using core::result::Result;
 
-template<typename T, typename E, typename U>
-constexpr static Result<T, E> Ok(U &&value) {
-    return Result<T, E>::Ok(core::cxxstd::forward<U>(value));
+template<typename T>
+constexpr static Result<T, core::Never> Ok(T value) {
+    return Result<T, core::Never>::Ok((T &&) value);
 }
 
-template<typename T, typename E, typename U>
-constexpr static Result<T, E> Err(U &&err) {
-    return Result<T, E>::Err(core::cxxstd::forward<U>(err));
+template<typename E>
+constexpr static Result<core::Never, E> Err(E err) {
+    return Result<core::Never, E>::Err((E &&) err);
 }
 
 }
-
