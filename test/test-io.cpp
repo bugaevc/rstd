@@ -1,29 +1,30 @@
 #include <rstd/std/fs.hpp>
 
 using namespace rstd;
-using rstd::core::slice::Slice;
 using rstd::std::fs::File;
-using rstd::std::io::ErrorKind;
 using rstd::std::io::BufReader;
+using rstd::std::io::BufWriter;
+using rstd::std::io::Stdout;
+using rstd::std::io::stdout;
 
-extern "C" int printf(const char *format, ...);
-
-void print_str(Slice<u8> str) {
-    for (u8 byte : str.iter()) {
-        printf("%c", byte);
-    }
-}
-
-int main() {
-    File file = File::open("/etc/fstab").unwrap();
+rstd::std::io::Result<UnitType> try_main() {
+    File file = try(File::open("/etc/fstab"));
     BufReader<File> br { core::cxxstd::move(file) };
+    BufWriter<Stdout> bw { stdout() };
     Vec<u8> line;
     while (true) {
-        usize res = br.read_line(line).unwrap();
+        usize res = try(br.read_line(line));
         if (res == 0) {
             break;
         }
-        print_str(line);
+        try(bw.write_all(line));
         line.clear();
     }
+    try(bw.flush());
+    return Ok(Unit);
+}
+
+int main() {
+    rstd::std::io::Result<UnitType> res = try_main();
+    return res.is_ok() ? 0 : 1;
 }
