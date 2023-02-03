@@ -1,6 +1,7 @@
 #include <rstd/std/io.hpp>
 
 #include <errno.h>
+#include <unistd.h>
 
 namespace rstd {
 namespace std {
@@ -27,6 +28,22 @@ Error Error::from_raw_os_error(i32 code) {
 
 Error Error::last_os_error() {
     return from_raw_os_error(errno);
+}
+
+Stdout stdout() {
+    return Stdout();
+}
+
+Result<usize> Stdout::write(core::slice::Slice<u8> buf) {
+    isize nwritten = ::write(STDOUT_FILENO, buf.as_ptr(), buf.len());
+    if (nwritten < 0) {
+        return Err(Error::last_os_error());
+    }
+    return Ok((usize) nwritten);
+}
+
+Result<UnitType> Stdout::flush() {
+    return Ok(Unit);
 }
 
 }

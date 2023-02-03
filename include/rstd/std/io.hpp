@@ -4,6 +4,7 @@
 #include <rstd/core/result.hpp>
 #include <rstd/core/macros.hpp>
 #include <rstd/core/tuple.hpp>
+#include <rstd/core/cmp.hpp>
 #include <rstd/alloc/vec.hpp>
 
 namespace rstd {
@@ -101,6 +102,34 @@ public:
 };
 
 template<typename Self>
+class Write {
+private:
+    Self &self() {
+        return (Self &) *this;
+    }
+
+protected:
+    Write() { }
+
+public:
+    Result<usize> write(core::slice::Slice<u8> buf);
+    Result<UnitType> flush();
+
+    Result<UnitType> write_all(core::slice::Slice<u8> buf) {
+        while (!buf.is_empty()) {
+            // TODO: Ignore ErrorKind::Interrupted
+            usize nwritten = try(self().write(buf));
+            if (nwritten == 0) {
+                return Err(Error(ErrorKind::WriteZero));
+            }
+            buf = buf[core::ops::RangeFrom<usize>(nwritten)];
+        }
+
+        return Ok(Unit);
+    }
+};
+
+template<typename Self>
 class BufRead : public Read<Self> {
 private:
     Self &self() {
@@ -191,6 +220,73 @@ public:
         }
     }
 };
+
+template<typename W>
+class BufWriter : public Write<BufWriter<W>> {
+private:
+    W inner;
+    Vec<u8> buf;
+
+public:
+    BufWriter(W &&inner)
+        : inner((W &&) inner)
+        , buf(Vec<u8>::with_capacity(8 * 1024))
+    { }
+
+    ~BufWriter() {
+        (void) flush();
+    }
+
+    core::slice::Slice<u8> buffer() const {
+        return buf;
+    }
+
+    usize capacity() const {
+        return buf.capacity();
+    }
+
+    Result<usize> write(core::slice::Slice<u8> data) {
+        usize available_space = buf.capacity() - buf.len();
+        if (available_space == 0) {
+            try(flush());
+            available_space = buf.capacity();
+        }
+        usize to_copy = core::cmp::min(available_space, data.len());
+        __builtin_memcpy(buf.as_ptr() + buf.len(), data.as_ptr(), to_copy);
+        buf.set_len(buf.len() + to_copy);
+        return Ok(to_copy);
+    }
+
+    Result<UnitType> flush() {
+        using core::slice::Slice;
+        using core::ops::RangeFrom;
+
+        usize written_total = 0;
+        while (written_total < buf.len()) {
+            Slice<u8> to_write = buf[RangeFrom<usize>(written_total)];
+            usize nwritten = try(inner.write(to_write));
+            if (nwritten == 0) {
+                return Err(Error(ErrorKind::WriteZero));
+            }
+            written_total += nwritten;
+        }
+        buf.clear();
+
+        return inner.flush();
+    }
+};
+
+class Stdout : public Write<Stdout> {
+private:
+    Stdout() { }
+    friend Stdout stdout();
+
+public:
+    Result<usize> write(core::slice::Slice<u8> buf);
+    Result<UnitType> flush();
+};
+
+Stdout stdout(void);
 
 }
 }
