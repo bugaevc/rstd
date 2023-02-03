@@ -1,4 +1,6 @@
-project('rstd', 'cpp', license: 'MIT OR Apache-2.0')
+project('rstd', 'cpp',
+  license: 'MIT OR Apache-2.0',
+  default_options: ['cpp_args=-nostdinc++'])
 
 inc = include_directories('include')
 subdir('src')
