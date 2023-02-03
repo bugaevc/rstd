@@ -47,14 +47,14 @@ public:
     }
 
     Slice operator[](ops::Range<usize> range) const {
-        if (range.end >= length || range.start < range.end) {
+        if (range.end > length || range.start < range.end) {
             panic();
         }
         return Slice { data + range.start, range.end - range.start };
     }
 
     Slice operator[](ops::RangeFrom<usize> range) const {
-        if (range.start >= length) {
+        if (range.start > length) {
             panic();
         }
         return Slice { data + range.start, length - range.start };
@@ -127,28 +127,28 @@ public:
     }
 
     Slice<T> operator[](ops::Range<usize> range) const {
-        if (range.end >= length || range.start < range.end) {
+        if (range.end > length || range.start < range.end) {
             panic();
         }
         return Slice<T> { data + range.start, range.end - range.start };
     }
 
     Slice<T> operator[](ops::RangeFrom<usize> range) const {
-        if (range.start >= length) {
+        if (range.start > length) {
             panic();
         }
         return Slice<T> { data + range.start, length - range.start };
     }
 
     SliceMut operator[](ops::Range<usize> range) {
-        if (range.end >= length || range.start < range.end) {
+        if (range.end > length || range.start < range.end) {
             panic();
         }
         return SliceMut { data + range.start, range.end - range.start };
     }
 
     SliceMut operator[](ops::RangeFrom<usize> range) {
-        if (range.start >= length) {
+        if (range.start > length) {
             panic();
         }
         return SliceMut { data + range.start, length - range.start };
