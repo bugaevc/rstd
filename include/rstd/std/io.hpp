@@ -91,12 +91,12 @@ public:
             // TODO: Ignore ErrorKind::Interrupted
             usize nread = try(self().read(buf));
             if (nread == 0) {
-                return Err<UnitType, Error>(Error(ErrorKind::UnexpectedEof));
+                return Err(Error(ErrorKind::UnexpectedEof));
             }
             buf = buf[core::ops::RangeFrom<usize>(nread)];
         }
 
-        return Ok<UnitType, Error>(Unit);
+        return Ok(Unit);
     }
 };
 
@@ -118,11 +118,7 @@ public:
         usize total_consumed = 0;
         const u8 *p;
         do {
-            Result<core::slice::Slice<u8>> i = self().fill_buf();
-            if (i.is_err()) {
-                return Err<usize, Error>(i.unwrap_err());
-            }
-            core::slice::Slice<u8> ibuf = i.unwrap();
+            core::slice::Slice<u8> ibuf = try(self().fill_buf());
             if (ibuf.is_empty()) {
                 break;
             }
@@ -139,7 +135,7 @@ public:
             self().consume(to_consume);
             total_consumed += to_consume;
         } while (p == nullptr);
-        return Ok<usize, Error>(total_consumed);
+        return Ok(total_consumed);
     }
 
     // TODO: This should read into a String, not a Vec<u8>.
@@ -175,17 +171,17 @@ public:
 
         if (consumed < buf.len()) {
             Slice<u8> b = buf[RangeFrom<usize>(consumed)];
-            return Ok<Slice<u8>, Error>(b);
+            return Ok(b);
         }
         consumed = 0;
         buf.set_len(buf.capacity());
         Result<usize> nread = inner.read(buf);
         if (nread.is_err()) {
             buf.set_len(0);
-            return Err<Slice<u8>, Error>(nread.unwrap_err());
+            return Err(nread.unwrap_err());
         }
         buf.set_len(nread.unwrap());
-        return Ok<Slice<u8>, Error>(buf);
+        return Ok((Slice<u8>) buf);
     }
 
     void consume(usize amount) {
