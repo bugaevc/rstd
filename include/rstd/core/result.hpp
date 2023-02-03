@@ -34,9 +34,9 @@ public:
         : is_ok_(other.is_ok_)
     {
         if (is_ok_) {
-            new(&success) T(cxxstd::move(other.success));
+            new(&success) T((T &&) other.success);
         } else {
-            new(&error) E(cxxstd::move(other.error));
+            new(&error) E((E &&) other.error);
         }
     }
 
@@ -82,7 +82,7 @@ public:
         if (!is_ok_) {
             panic();
         }
-        return cxxstd::move(success);
+        return (T &&) success;
     }
 
     E &unwrap_err() & {
@@ -103,7 +103,7 @@ public:
         if (is_ok_) {
             panic();
         }
-        return cxxstd::move(error);
+        return (E &&) error;
     }
 
     template<typename F>

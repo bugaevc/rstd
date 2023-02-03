@@ -153,7 +153,7 @@ private:
 
 public:
     BufReader(R &&inner)
-        : inner(core::cxxstd::move(inner))
+        : inner((R &&) inner)
         , buf(Vec<u8>::with_capacity(8 * 1024))
     { }
 
