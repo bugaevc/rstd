@@ -62,7 +62,33 @@ struct invoke_result<F, Args...> {
     );
 };
 
-}
-}
-}
+template<bool B, typename T = void>
+struct enable_if { };
 
+template<typename T>
+struct enable_if<true, T> {
+    using type = T;
+};
+
+template<bool B, typename T = void>
+using enable_if_t = typename enable_if<B, T>::type;
+
+template<typename A, typename B>
+struct is_same {
+    constexpr static bool value = false;
+};
+
+template<typename T>
+struct is_same<T, T> {
+    constexpr static bool value = true;
+};
+
+template<typename A, typename B>
+constexpr static bool is_same_v = is_same<A, B>::value;
+
+template<typename A, typename B, typename T = void>
+using enable_if_same_t = enable_if_t<is_same_v<A, B>, T>;
+
+}
+}
+}
