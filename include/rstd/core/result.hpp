@@ -2,13 +2,14 @@
 
 #include <rstd/core/cxxstd.hpp>
 #include <rstd/core/panicking.hpp>
+#include <rstd/core/macros.hpp>
 
 namespace rstd {
 namespace core {
 namespace result {
 
 template<typename T, typename E>
-class Result {
+class must_use Result {
 private:
     bool is_ok_;
     union {

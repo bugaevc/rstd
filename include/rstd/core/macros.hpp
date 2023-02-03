@@ -25,3 +25,13 @@
     } \
     __res.unwrap(); \
 })
+
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(x) 0
+#endif
+
+#if __has_cpp_attribute(nodiscard)
+#define must_use [[nodiscard]]
+#else
+#define must_use
+#endif
