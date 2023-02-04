@@ -34,7 +34,7 @@ public:
     }
 };
 
-constexpr usize next_power_of_two(usize self) {
+static inline usize next_power_of_two(usize self) {
     if (self <= 1) {
         return 1;
     }
