@@ -18,7 +18,7 @@ private:
     mem::MaybeUninit<T> value;
 
 public:
-    static constexpr typeof(rstd::None) None = rstd::None;
+    static constexpr NoneType None = rstd::None;
     static Option Some(T &&value) {
         return Option(cxxstd::forward<T>(value));
     }
@@ -27,7 +27,7 @@ public:
         : is_some_(false)
     { }
 
-    constexpr Option(typeof(None)) noexcept
+    constexpr Option(NoneType) noexcept
         : is_some_(false)
     { }
 
