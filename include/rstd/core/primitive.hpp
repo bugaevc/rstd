@@ -39,7 +39,7 @@ static inline usize next_power_of_two(usize self) {
         return 1;
     }
     int clzl = __builtin_clzl(self);
-    usize np2 = 1ul << (sizeof(usize) - clzl);
+    usize np2 = 1ul << (sizeof(usize) * 8 - clzl);
     if (self * 2 == np2) {
         return self;
     }
