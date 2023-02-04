@@ -33,11 +33,10 @@ T &&forward(typename remove_reference<T>::type &&obj) noexcept {
 }
 
 template<typename T>
-static constexpr bool templated_false = false;
-
-template<typename T>
 T &&declval() noexcept {
-    static_assert(templated_false<T>, "declval() can not be actually evaluated");
+    // declval<T>() can never actually be evaluated; so cause
+    // a compile-time error if its body is compiled.
+    return (const T *) nullptr;
 }
 
 template<typename...>
@@ -86,11 +85,8 @@ struct is_same<T, T> {
     constexpr static bool value = true;
 };
 
-template<typename A, typename B>
-constexpr static bool is_same_v = is_same<A, B>::value;
-
 template<typename A, typename B, typename T = void>
-using enable_if_same_t = enable_if_t<is_same_v<A, B>, T>;
+using enable_if_same_t = enable_if_t<is_same<A, B>::value, T>;
 
 }
 }
