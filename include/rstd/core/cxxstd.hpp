@@ -62,6 +62,9 @@ struct invoke_result<F, Args...> {
     );
 };
 
+template<typename F, typename... Args>
+using invoke_result_t = typename invoke_result<F, Args...>::type;
+
 template<bool B, typename T = void>
 struct enable_if { };
 

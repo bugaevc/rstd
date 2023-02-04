@@ -1,6 +1,7 @@
 #pragma once
 
 #include <rstd/core/slice.hpp>
+#include <rstd/core/cxxstd.hpp>
 
 namespace rstd {
 namespace std {
@@ -18,11 +19,12 @@ public:
     { }
 
     template<typename F>
-    auto run_with_cstr(F f) const {
+    core::cxxstd::invoke_result_t<F, const char *>
+    run_with_cstr(F f) const {
         char *ptr = (char *) __builtin_malloc(bytes.len() + 1);
         __builtin_memcpy(ptr, bytes.as_ptr(), bytes.len());
         ptr[bytes.len()] = 0;
-        auto res = f(ptr);
+        auto res = f((const char *) ptr);
         __builtin_free(ptr);
         return res;
     }
