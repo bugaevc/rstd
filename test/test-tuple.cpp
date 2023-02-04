@@ -3,9 +3,6 @@
 
 using namespace rstd;
 
-using core::tuple::Tuple;
-using rstd::std::fs::File;
-
 extern "C" int printf(const char *format, ...);
 
 int main() {
