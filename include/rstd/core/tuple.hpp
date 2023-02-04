@@ -14,17 +14,21 @@ namespace __internal {
 
 template<usize index, typename T, typename... Ts>
 struct getter {
-    static const auto &get(const Tuple<T, Ts...> &tuple) {
+    typedef typename getter<index - 1, Ts...>::type type;
+
+    static const type &get(const Tuple<T, Ts...> &tuple) {
         return getter<index - 1, Ts...>::get(tuple.tail);
     }
 
-    static auto &get(Tuple<T, Ts...> &tuple) {
+    static type &get(Tuple<T, Ts...> &tuple) {
         return getter<index - 1, Ts...>::get(tuple.tail);
     }
 };
 
 template<typename T, typename... Ts>
 struct getter<0, T, Ts...> {
+    typedef T type;
+
     static const T &get(const Tuple<T, Ts...> &tuple) {
         return tuple.head;
     }
@@ -56,12 +60,15 @@ public:
     { }
 
     template<usize index>
-    const auto &get() const {
+    using element_type = typename __internal::getter<index, T, Ts...>::type;
+
+    template<usize index>
+    const element_type<index> &get() const {
         return __internal::getter<index, T, Ts...>::get(*this);
     }
 
     template<usize index>
-    auto &get() {
+    element_type<index> &get() {
         return __internal::getter<index, T, Ts...>::get(*this);
     }
 };
