@@ -64,9 +64,12 @@ public:
         return Slice { data, len };
     }
 
+    static Slice empty() {
+        return Slice { nullptr, 0 };
+    }
+
     template<usize N>
-    Slice(const T (&arr)[N])
-    {
+    Slice(const T (&arr)[N]) {
         data = &arr[0];
         length = N;
     }
@@ -159,9 +162,12 @@ public:
         return SliceMut { data, len };
     }
 
+    static SliceMut empty() {
+        return SliceMut { nullptr, 0 };
+    }
+
     template<usize N>
-    SliceMut(T (&arr)[N])
-    {
+    SliceMut(T (&arr)[N]) {
         data = &arr[0];
         length = N;
     }
