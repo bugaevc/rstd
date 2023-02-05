@@ -24,13 +24,25 @@ namespace core {
 class Never {
 private:
     Never() {
-        __builtin_abort();
+        __builtin_unreachable();
     }
 
 public:
+    Never(const Never &other) {
+        __builtin_unreachable();
+    }
+
+    Never(Never &&other) {
+        __builtin_unreachable();
+    }
+
+    ~Never() {
+        __builtin_unreachable();
+    }
+
     template<typename T>
     operator T() const {
-        __builtin_abort();
+        __builtin_unreachable();
     }
 };
 
