@@ -5,6 +5,7 @@
 #include <rstd/core/option.hpp>
 #include <rstd/core/iter.hpp>
 #include <rstd/core/ops.hpp>
+#include <rstd/core/tuple.hpp>
 
 namespace rstd {
 namespace core {
@@ -84,6 +85,31 @@ public:
 
     Iter<T> iter() const {
         return Iter<T>(*this);
+    }
+
+    Tuple<Slice, Slice> split_at(usize mid) const {
+        if (mid > length) {
+            panic();
+        }
+        Slice first { data, mid };
+        Slice second { data + mid, length - mid };
+        return Tuple<Slice, Slice>(first, second);
+    }
+
+    Option<Tuple<T &, Slice>> split_first() const {
+        if (is_empty()) {
+            return None;
+        }
+        Slice tail { data + 1, length - 1 };
+        return Some(Tuple<T &, Slice>(data[0], tail));
+    }
+
+    Option<Tuple<T &, Slice>> split_last() const {
+        if (is_empty()) {
+            return None;
+        }
+        Slice head { data, length - 1 };
+        return Some(Tuple<T &, Slice>(data[length - 1], head));
     }
 };
 
