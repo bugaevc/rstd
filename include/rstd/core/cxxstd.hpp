@@ -18,17 +18,20 @@ template<typename T>
 struct remove_reference<T &&> { typedef T type; };
 
 template<typename T>
-typename remove_reference<T>::type &&move(T &&obj) noexcept {
-    return (typename remove_reference<T>::type &&) obj;
+using remove_reference_t = typename remove_reference<T>::type;
+
+template<typename T>
+remove_reference_t<T> &&move(T &&obj) noexcept {
+    return (remove_reference_t<T> &&) obj;
 }
 
 template<typename T>
-T &&forward(typename remove_reference<T>::type &obj) noexcept {
+T &&forward(remove_reference_t<T> &obj) noexcept {
     return (T &&) obj;
 }
 
 template<typename T>
-T &&forward(typename remove_reference<T>::type &&obj) noexcept {
+T &&forward(remove_reference_t<T> &&obj) noexcept {
     return (T &&) obj;
 }
 
