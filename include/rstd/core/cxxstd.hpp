@@ -122,6 +122,9 @@ struct is_same<T, T> {
 template<typename A, typename B, typename T = void>
 using enable_if_same_t = enable_if_t<is_same<A, B>::value, T>;
 
+template<typename T, typename U = void>
+using disable_if_lvalue_reference_t = enable_if_t<!is_lvalue_reference<T>::value, U>;
+
 }
 }
 }

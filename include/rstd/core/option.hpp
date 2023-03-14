@@ -17,10 +17,20 @@ private:
     bool is_some_;
     mem::MaybeUninit<T> value;
 
+    struct PrivateToken { };
+
+    template<typename U>
+    constexpr Option(PrivateToken, U &&value)
+        : is_some_(true)
+        , value(cxxstd::forward<U>(value))
+    { }
+
 public:
     static constexpr NoneType None = rstd::None;
-    static Option Some(T &&value) {
-        return Option(cxxstd::forward<T>(value));
+
+    template<typename U>
+    static constexpr Option Some(U &&value) {
+        return Option { PrivateToken(), cxxstd::forward<U>(value) };
     }
 
     constexpr Option() noexcept
@@ -29,11 +39,6 @@ public:
 
     constexpr Option(NoneType) noexcept
         : is_some_(false)
-    { }
-
-    Option(T &&value)
-        : is_some_(true)
-        , value(cxxstd::forward<T>(value))
     { }
 
     Option(Option &other)
@@ -133,13 +138,13 @@ public:
 
 using core::option::Option;
 
-template <typename T>
+template<typename T>
 Option<T> Some(const T &value) {
-    return Option<T>(value);
+    return Option<T>::Some(value);
 }
 
-template <typename T>
+template<typename T, typename = core::cxxstd::disable_if_lvalue_reference_t<T>>
 Option<T> Some(T &&value) {
-    return Option<T>(core::cxxstd::forward<T>(value));
+    return Option<T>::Some((T &&) value);
 }
 }

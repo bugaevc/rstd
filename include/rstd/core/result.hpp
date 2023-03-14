@@ -241,12 +241,22 @@ public:
 using core::result::Result;
 
 template<typename T>
-constexpr static Result<T, core::Never> Ok(T value) {
+constexpr static Result<T, core::Never> Ok(const T &value) {
+    return Result<T, core::Never>::Ok(value);
+}
+
+template<typename T, typename = core::cxxstd::disable_if_lvalue_reference_t<T>>
+constexpr static Result<T, core::Never> Ok(T &&value) {
     return Result<T, core::Never>::Ok((T &&) value);
 }
 
 template<typename E>
-constexpr static Result<core::Never, E> Err(E err) {
+constexpr static Result<core::Never, E> Err(const E &err) {
+    return Result<core::Never, E>::Err((E &&) err);
+}
+
+template<typename E, typename = core::cxxstd::disable_if_lvalue_reference_t<E>>
+constexpr static Result<core::Never, E> Err(E &&err) {
     return Result<core::Never, E>::Err((E &&) err);
 }
 

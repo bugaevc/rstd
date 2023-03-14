@@ -17,7 +17,7 @@ public:
     }
 
     constexpr MaybeUninit(T &&value)
-        : value(value)
+        : value((T &&) value)
     {
         static_assert(sizeof(MaybeUninit) == sizeof(T));
         static_assert(alignof(MaybeUninit) == alignof(T));

@@ -41,7 +41,7 @@ public:
         { }
 
         iterator(MaybeOwnedIter &&iter)
-            : iter(cxxstd::forward<MaybeOwnedIter>(iter))
+            : iter(Some<MaybeOwnedIter>(iter))
         {
             item = this->iter.unwrap().next();
         }
@@ -162,11 +162,11 @@ public:
     { }
 
     Option<typename cxxstd::invoke_result<F, typename I::Item>::type> next() {
-        auto item = inner.next();
+        Option<typename I::Item> item = inner.next();
         if (item.is_none()) {
             return None;
         }
-        return transform(item.unwrap());
+        return Some(transform(item.unwrap()));
     }
 };
 
@@ -184,7 +184,7 @@ public:
 
     Option<typename I::Item> next() {
         while (true) {
-            auto item = inner.next();
+            Option<typename I::Item> item = inner.next();
             if (item.is_none()) {
                 return None;
             }
