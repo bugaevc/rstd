@@ -57,6 +57,10 @@ static inline usize next_power_of_two(usize self) {
     }
     return np2;
 }
+
+static inline constexpr bool is_ascii(u8 byte) {
+    return byte < 128;
+}
 }
 
 using core::Never;

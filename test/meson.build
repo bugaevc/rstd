@@ -9,3 +9,6 @@ test('test-io', test_io)
 
 test_tuple = executable('test-tuple', 'test-tuple.cpp', dependencies: rstd)
 test('test-tuple', test_tuple)
+
+test_str = executable('test-str', 'test-str.cpp', dependencies: rstd)
+test('test-str', test_str)
