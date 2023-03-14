@@ -38,6 +38,45 @@ struct getter<0, T, Ts...> {
     }
 };
 
+template<typename... Ts>
+class Tie;
+
+template<>
+class Tie<> {
+public:
+    Tie<> &operator = (const Tuple<> &) {
+        return *this;
+    }
+    Tie<> &operator = (Tuple<> &&) {
+        return *this;
+    }
+};
+
+template<typename T, typename... Ts>
+class Tie<T, Ts...> {
+private:
+    T &head;
+    Tie<Ts...> tail;
+
+public:
+    Tie(T &head, Tie<Ts...> tail)
+        : head(head)
+        , tail(tail)
+    { }
+
+    Tie<T, Ts...> &operator = (const Tuple<T, Ts...> &tuple) {
+        head = tuple.head;
+        tail = tuple.tail;
+        return *this;
+    }
+
+    Tie<T, Ts...> &operator = (Tuple<T, Ts...> &&tuple) {
+        head = (T &&) tuple.head;
+        tail = (Tuple<Ts...> &&) tuple.tail;
+        return *this;
+    }
+};
+
 }
 
 template<>
@@ -51,6 +90,7 @@ private:
 
     template<usize index>
     friend struct __internal::getter;
+    friend class __internal::Tie<T, Ts...>;
 
 public:
     template<typename U, typename... Us>
@@ -76,6 +116,19 @@ public:
 typedef Tuple<> UnitType;
 static constexpr UnitType Unit { };
 
+template<typename... Ts>
+static inline __internal::Tie<Ts...> tie(Ts &...);
+
+template<>
+inline  __internal::Tie<> tie() {
+    return __internal::Tie<>();
+}
+
+template<typename T, typename... Ts>
+inline  __internal::Tie<T, Ts...> tie(T &first, Ts &...rest) {
+    return __internal::Tie<T, Ts...> { first, tie<Ts...>(rest...) };
+}
+
 }
 }
 
@@ -83,4 +136,3 @@ using core::tuple::Tuple;
 using core::tuple::Unit;
 using core::tuple::UnitType;
 }
-

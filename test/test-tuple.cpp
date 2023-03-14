@@ -10,4 +10,9 @@ int main() {
     printf("%d, %d\n", tuple.get<0>(), tuple.get<1>());
     tuple.get<1>() = 35;
     printf("%d, %d\n", tuple.get<0>(), tuple.get<1>());
+
+    i8 a;
+    u32 b;
+    core::tuple::tie(a, b) = tuple;
+    printf("%d, %d\n", a, b);
 }
