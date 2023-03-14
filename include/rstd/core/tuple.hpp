@@ -16,11 +16,11 @@ template<usize index, typename T, typename... Ts>
 struct getter {
     typedef typename getter<index - 1, Ts...>::type type;
 
-    static const type &get(const Tuple<T, Ts...> &tuple) {
+    static const type &get(const Tuple<T, Ts...> &tuple) noexcept {
         return getter<index - 1, Ts...>::get(tuple.tail);
     }
 
-    static type &get(Tuple<T, Ts...> &tuple) {
+    static type &get(Tuple<T, Ts...> &tuple) noexcept {
         return getter<index - 1, Ts...>::get(tuple.tail);
     }
 };
@@ -29,11 +29,11 @@ template<typename T, typename... Ts>
 struct getter<0, T, Ts...> {
     typedef T type;
 
-    static const T &get(const Tuple<T, Ts...> &tuple) {
+    static const T &get(const Tuple<T, Ts...> &tuple) noexcept {
         return tuple.head;
     }
 
-    static T &get(Tuple<T, Ts...> &tuple) {
+    static T &get(Tuple<T, Ts...> &tuple) noexcept {
         return tuple.head;
     }
 };
@@ -44,10 +44,10 @@ class Tie;
 template<>
 class Tie<> {
 public:
-    Tie<> &operator = (const Tuple<> &) {
+    Tie<> &operator = (const Tuple<> &) noexcept {
         return *this;
     }
-    Tie<> &operator = (Tuple<> &&) {
+    Tie<> &operator = (Tuple<> &&) noexcept {
         return *this;
     }
 };
@@ -59,7 +59,7 @@ private:
     Tie<Ts...> tail;
 
 public:
-    Tie(T &head, Tie<Ts...> tail)
+    constexpr Tie(T &head, Tie<Ts...> tail) noexcept
         : head(head)
         , tail(tail)
     { }
@@ -103,12 +103,12 @@ public:
     using element_type = typename __internal::getter<index, T, Ts...>::type;
 
     template<usize index>
-    const element_type<index> &get() const {
+    const element_type<index> &get() const noexcept {
         return __internal::getter<index, T, Ts...>::get(*this);
     }
 
     template<usize index>
-    element_type<index> &get() {
+    element_type<index> &get() noexcept {
         return __internal::getter<index, T, Ts...>::get(*this);
     }
 };
@@ -117,15 +117,15 @@ typedef Tuple<> UnitType;
 static constexpr UnitType Unit { };
 
 template<typename... Ts>
-static inline __internal::Tie<Ts...> tie(Ts &...);
+static inline __internal::Tie<Ts...> tie(Ts &...) noexcept;
 
 template<>
-inline  __internal::Tie<> tie() {
+constexpr inline  __internal::Tie<> tie() noexcept {
     return __internal::Tie<>();
 }
 
 template<typename T, typename... Ts>
-inline  __internal::Tie<T, Ts...> tie(T &first, Ts &...rest) {
+constexpr inline  __internal::Tie<T, Ts...> tie(T &first, Ts &...rest) noexcept {
     return __internal::Tie<T, Ts...> { first, tie<Ts...>(rest...) };
 }
 

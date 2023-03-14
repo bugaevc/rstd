@@ -31,17 +31,17 @@ struct is_lvalue_reference<T &> {
 };
 
 template<typename T>
-remove_reference_t<T> &&move(T &&obj) noexcept {
+constexpr remove_reference_t<T> &&move(T &&obj) noexcept {
     return (remove_reference_t<T> &&) obj;
 }
 
 template<typename T>
-T &&forward(remove_reference_t<T> &obj) noexcept {
+constexpr T &&forward(remove_reference_t<T> &obj) noexcept {
     return (T &&) obj;
 }
 
 template<typename T>
-T &&forward(remove_reference_t<T> &&obj) noexcept {
+constexpr T &&forward(remove_reference_t<T> &&obj) noexcept {
     static_assert(!is_lvalue_reference<T>::value);
     return (T &&) obj;
 }
@@ -83,7 +83,7 @@ class mem_fn_t {
     M T::*pm;
 
 public:
-    mem_fn_t(M T::*pm)
+    constexpr mem_fn_t(M T::*pm) noexcept
         : pm(pm)
     { }
 
@@ -94,7 +94,7 @@ public:
 };
 
 template<typename M, typename T>
-mem_fn_t<M, T> mem_fn(M T::*pm) {
+constexpr mem_fn_t<M, T> mem_fn(M T::*pm) noexcept {
     return mem_fn_t<M, T>(pm);
 }
 

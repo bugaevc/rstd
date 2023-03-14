@@ -89,11 +89,11 @@ public:
         return *this;
     }
 
-    constexpr bool is_some() const {
+    constexpr bool is_some() const noexcept {
         return is_some_;
     }
 
-    constexpr bool is_none() const {
+    constexpr bool is_none() const noexcept {
         return !is_some_;
     }
 
@@ -139,12 +139,12 @@ public:
 using core::option::Option;
 
 template<typename T>
-Option<T> Some(const T &value) {
+constexpr Option<T> Some(const T &value) {
     return Option<T>::Some(value);
 }
 
 template<typename T, typename = core::cxxstd::disable_if_lvalue_reference_t<T>>
-Option<T> Some(T &&value) {
+constexpr Option<T> Some(T &&value) {
     return Option<T>::Some((T &&) value);
 }
 }

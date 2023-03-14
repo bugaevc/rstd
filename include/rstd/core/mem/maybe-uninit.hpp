@@ -11,7 +11,7 @@ union MaybeUninit {
 private:
     T value;
 public:
-    constexpr MaybeUninit() {
+    constexpr MaybeUninit() noexcept {
         static_assert(sizeof(MaybeUninit) == sizeof(T));
         static_assert(alignof(MaybeUninit) == alignof(T));
     }
@@ -30,16 +30,16 @@ public:
         static_assert(alignof(MaybeUninit) == alignof(T));
     }
 
-    ~MaybeUninit() { }
+    ~MaybeUninit() noexcept { }
 
     MaybeUninit(MaybeUninit&) = delete;
     MaybeUninit(MaybeUninit&&) = delete;
 
-    u8 *as_bytes() {
+    u8 *as_bytes() noexcept {
         return (u8 *) &value;
     }
 
-    const u8 *as_bytes() const {
+    const u8 *as_bytes() const noexcept {
         return (const u8 *) &value;
     }
 
@@ -52,11 +52,11 @@ public:
         value.~T();
     }
 
-    T &assume_init() {
+    T &assume_init() noexcept {
         return value;
     }
 
-    const T &assume_init() const {
+    const T &assume_init() const noexcept {
         return value;
     }
 };
@@ -66,34 +66,34 @@ union MaybeUninit<T &> {
 private:
     T *ptr;
 public:
-    MaybeUninit() { }
-    MaybeUninit(T &ref)
+    constexpr MaybeUninit() noexcept { }
+    constexpr MaybeUninit(T &ref)
         : ptr(&ref) { }
-    ~MaybeUninit() { }
+    ~MaybeUninit() noexcept { }
 
     MaybeUninit(MaybeUninit&) = delete;
     MaybeUninit(MaybeUninit&&) = delete;
 
-    u8 *as_bytes() {
+    u8 *as_bytes() noexcept {
         return (u8 *) &ptr;
     }
 
-    const u8 *as_bytes() const {
+    const u8 *as_bytes() const noexcept {
         return (const u8 *) &ptr;
     }
 
-    T &construct(T &ref) {
+    T &construct(T &ref) noexcept {
         ptr = &ref;
         return ref;
     }
 
-    void destruct() { }
+    constexpr void destruct() const noexcept { }
 
-    T &assume_init() {
+    T &assume_init() noexcept {
         return *ptr;
     }
 
-    const T &assume_init() const {
+    const T &assume_init() const noexcept {
         return *ptr;
     }
 };

@@ -23,20 +23,20 @@ private:
     const T *data;
     usize length;
 
-    Slice(const T *data, usize length)
+    constexpr Slice(const T *data, usize length) noexcept
         : data(data), length(length)
     { }
 
 public:
-    usize len() const {
+    constexpr usize len() const noexcept {
         return length;
     }
 
-    bool is_empty() const {
+    constexpr bool is_empty() const noexcept {
         return length == 0;
     }
 
-    const T *as_ptr() const {
+    constexpr const T *as_ptr() const noexcept {
         return data;
     }
 
@@ -61,21 +61,21 @@ public:
         return Slice { data + range.start, length - range.start };
     }
 
-    static Slice from_raw_parts(const T *data, usize len) {
+    static constexpr Slice from_raw_parts(const T *data, usize len) noexcept {
         return Slice { data, len };
     }
 
-    static Slice empty() {
+    static constexpr Slice empty() noexcept {
         return Slice { nullptr, 0 };
     }
 
     template<usize N>
-    Slice(const T (&arr)[N]) {
-        data = &arr[0];
-        length = N;
-    }
+    constexpr Slice(const T (&arr)[N]) noexcept
+        : data(arr)
+        , length(N)
+    { }
 
-    Option<const T &> get(usize index) const {
+    Option<const T &> get(usize index) const noexcept {
         if (index >= length) {
             return None;
         } else {
@@ -83,7 +83,7 @@ public:
         }
     }
 
-    Iter<T> iter() const {
+    constexpr Iter<T> iter() const noexcept {
         return Iter<T>(*this);
     }
 
@@ -119,24 +119,24 @@ private:
     T *data;
     usize length;
 
-    SliceMut(T *data, usize length)
+    constexpr SliceMut(T *data, usize length) noexcept
         : data(data), length(length)
     {}
 
 public:
-    usize len() const {
+    constexpr usize len() const noexcept {
         return length;
     }
 
-    bool is_empty() const {
+    constexpr bool is_empty() const noexcept {
         return length == 0;
     }
 
-    T *as_ptr() const {
+    constexpr T *as_ptr() const noexcept {
         return data;
     }
 
-    operator Slice<T>() const
+    constexpr operator Slice<T>() const noexcept
     {
         return Slice<T>::from_raw_parts(data, length);
     }
@@ -183,26 +183,26 @@ public:
         return SliceMut { data + range.start, length - range.start };
     }
 
-    static SliceMut from_raw_parts(T *data, usize len)
+    constexpr static SliceMut from_raw_parts(T *data, usize len) noexcept
     {
         return SliceMut { data, len };
     }
 
-    static SliceMut empty() {
+    constexpr static SliceMut empty() noexcept {
         return SliceMut { nullptr, 0 };
     }
 
     template<usize N>
-    SliceMut(T (&arr)[N]) {
-        data = &arr[0];
-        length = N;
-    }
+    constexpr SliceMut(T (&arr)[N]) noexcept
+        : data(arr)
+        , length(N)
+    { }
 
-    Iter<T> iter() const {
+    constexpr Iter<T> iter() const noexcept {
         return Iter<T>(*this);
     }
 
-    IterMut<T> iter_mut() const {
+    constexpr IterMut<T> iter_mut() const noexcept {
         return IterMut<T>(*this);
     }
 };
@@ -213,7 +213,7 @@ private:
     Slice<T> slice;
 
 public:
-    Iter(Slice<T> slice)
+    constexpr Iter(Slice<T> slice) noexcept
         : slice(slice)
     { }
 
@@ -233,7 +233,7 @@ private:
     SliceMut<T> slice;
 
 public:
-    IterMut(SliceMut<T> slice)
+    constexpr IterMut(SliceMut<T> slice) noexcept
         : slice(slice)
     { }
 

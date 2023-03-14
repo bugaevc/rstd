@@ -56,11 +56,11 @@ public:
         return res;
     }
 
-    constexpr bool is_ok() const {
+    constexpr bool is_ok() const noexcept {
         return is_ok_;
     }
 
-    constexpr bool is_err() const {
+    constexpr bool is_err() const noexcept {
         return !is_ok_;
     }
 
@@ -130,31 +130,36 @@ class must_use Result<T, Never> {
 private:
     T success;
 
+    struct PrivateToken { };
+
+    template<typename U>
+    constexpr Result(PrivateToken, U &&value)
+        : success(cxxstd::forward<U>(value))
+    { }
+
 public:
     template<typename U>
     constexpr static Result Ok(U &&value) {
-        mem::MaybeUninit<Result> res;
-        new(res.as_bytes()) T(cxxstd::forward<U>(value));
-        return cxxstd::move(res.assume_init());
+        return Result { PrivateToken(), cxxstd::forward<U>(value) };
     }
 
-    constexpr bool is_ok() const {
+    constexpr bool is_ok() const noexcept {
         return true;
     }
 
-    constexpr bool is_err() const {
+    constexpr bool is_err() const noexcept {
         return false;
     }
 
-    T &unwrap() & {
+    T &unwrap() & noexcept {
         return success;
     }
 
-    const T &unwrap() const & {
+    const T &unwrap() const & noexcept {
         return success;
     }
 
-    T &&unwrap() && {
+    T &&unwrap() && noexcept {
         return (T &&) success;
     }
 
@@ -168,14 +173,14 @@ public:
     }
 
     template<typename F>
-    Result<T, Never> map_err(F f) {
+    constexpr Result<T, Never> map_err(F f) noexcept {
         return *this;
     }
 
     // Support for implicitly converting Ok(val) from Result<T, Never> into
     // Result<T, E>.
     template<typename E>
-    operator Result<T, E>() && {
+    constexpr operator Result<T, E>() && {
         return Result<T, E>::Ok((T &&) success);
     }
 };
@@ -185,19 +190,24 @@ class must_use Result<Never, E> {
 private:
     E error;
 
+    struct PrivateToken { };
+
+    template<typename U>
+    constexpr Result(PrivateToken, U &&err)
+        : error(cxxstd::forward<U>(err))
+    { }
+
 public:
     template<typename U>
     constexpr static Result Err(U &&err) {
-        mem::MaybeUninit<Result> res;
-        new(res.as_bytes()) E(cxxstd::forward<U>(err));
-        return cxxstd::move(res.assume_init());
+        return Result { PrivateToken(), cxxstd::forward<E>(err) };
     }
 
-    constexpr bool is_ok() const {
+    constexpr bool is_ok() const noexcept {
         return false;
     }
 
-    constexpr bool is_err() const {
+    constexpr bool is_err() const noexcept {
         return true;
     }
 
@@ -205,20 +215,20 @@ public:
         return panic();
     }
 
-    E &unwrap_err() & {
+    E &unwrap_err() & noexcept {
         return error;
     }
 
-    const E &unwrap_err() const & {
+    const E &unwrap_err() const & noexcept {
         return error;
     }
 
-    E &&unwrap_err() && {
+    E &&unwrap_err() && noexcept {
         return (E &&) error;
     }
 
     template<typename F>
-    Result<Never, E> map(F f) {
+    constexpr Result<Never, E> map(F f) {
         return *this;
     }
 
@@ -230,7 +240,7 @@ public:
     // Support for implicitly converting Err(err) from Result<Never, E> into
     // Result<T, E>.
     template<typename T>
-    operator Result<T, E>() && {
+    constexpr operator Result<T, E>() && {
         return Result<T, E>::Err((E &&) error);
     }
 };
