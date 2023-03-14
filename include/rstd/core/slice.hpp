@@ -223,4 +223,7 @@ public:
 
 }
 }
+
+using core::slice::Slice;
+using core::slice::SliceMut;
 }
