@@ -2,8 +2,6 @@
 #include <rstd/core/macros.hpp>
 using namespace rstd;
 
-using alloc::vec::Vec;
-
 extern "C" int printf(const char *format, ...);
 
 int main() {
