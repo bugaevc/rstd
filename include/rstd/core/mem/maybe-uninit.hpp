@@ -11,13 +11,20 @@ union MaybeUninit {
 private:
     T value;
 public:
-    MaybeUninit() {
+    constexpr MaybeUninit() {
         static_assert(sizeof(MaybeUninit) == sizeof(T));
         static_assert(alignof(MaybeUninit) == alignof(T));
     }
 
-    MaybeUninit(T &&value)
-        : value(cxxstd::forward<T>(value))
+    constexpr MaybeUninit(T &&value)
+        : value(value)
+    {
+        static_assert(sizeof(MaybeUninit) == sizeof(T));
+        static_assert(alignof(MaybeUninit) == alignof(T));
+    }
+
+    constexpr MaybeUninit(const T &value)
+        : value(value)
     {
         static_assert(sizeof(MaybeUninit) == sizeof(T));
         static_assert(alignof(MaybeUninit) == alignof(T));
