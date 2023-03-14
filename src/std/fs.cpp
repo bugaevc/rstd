@@ -15,7 +15,7 @@ io::Result<File> File::open(path::Path path) {
     return Ok(File(os::fd::OwnedFd(fd)));
 }
 
-io::Result<usize> File::read(core::slice::SliceMut<u8> buf) {
+io::Result<usize> File::read(SliceMut<u8> buf) {
     isize rc = ::read(fd.as_raw_fd(), buf.as_ptr(), buf.len());
     if (rc < 0)
         return Err(io::Error::last_os_error());

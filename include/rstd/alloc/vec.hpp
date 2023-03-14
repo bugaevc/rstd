@@ -12,18 +12,18 @@ template<typename T>
 class Vec {
 private:
     usize length { 0 };
-    core::slice::SliceMut<core::mem::MaybeUninit<T>> mem;
+    SliceMut<core::mem::MaybeUninit<T>> mem;
 
-    static core::slice::SliceMut<core::mem::MaybeUninit<T>> empty_mem() {
-        return core::slice::SliceMut<core::mem::MaybeUninit<T>>::empty();
+    static SliceMut<core::mem::MaybeUninit<T>> empty_mem() {
+        return SliceMut<core::mem::MaybeUninit<T>>::empty();
     }
 
-    static core::slice::SliceMut<core::mem::MaybeUninit<T>> realloc_mem(core::slice::SliceMut<core::mem::MaybeUninit<T>> old, usize count) {
+    static SliceMut<core::mem::MaybeUninit<T>> realloc_mem(SliceMut<core::mem::MaybeUninit<T>> old, usize count) {
         auto *alloc = (core::mem::MaybeUninit<T> *) __builtin_realloc((void *) old.as_ptr(), count * sizeof(T));
         if (alloc == nullptr) {
             panic();
         }
-        return core::slice::SliceMut<core::mem::MaybeUninit<T>>::from_raw_parts(alloc, count);
+        return SliceMut<core::mem::MaybeUninit<T>>::from_raw_parts(alloc, count);
     }
 
 public:
@@ -140,20 +140,20 @@ public:
         return (T *) mem.as_ptr();
     }
 
-    operator core::slice::Slice<T>() const {
-        return core::slice::Slice<T>::from_raw_parts(as_ptr(), length);
+    operator Slice<T>() const {
+        return Slice<T>::from_raw_parts(as_ptr(), length);
     }
 
-    operator core::slice::SliceMut<T>() {
-        return core::slice::SliceMut<T>::from_raw_parts(as_ptr(), length);
+    operator SliceMut<T>() {
+        return SliceMut<T>::from_raw_parts(as_ptr(), length);
     }
 
     core::slice::Iter<T> iter() const {
-        return ((core::slice::Slice<T>) *this).iter();
+        return ((Slice<T>) *this).iter();
     }
 
     core::slice::IterMut<T> iter_mut() {
-        return ((core::slice::SliceMut<T>) *this).iter_mut();
+        return ((SliceMut<T>) *this).iter_mut();
     }
 
     template<typename I>
@@ -166,19 +166,19 @@ public:
     }
 
     const T &operator [](usize index) const {
-        return ((core::slice::Slice<T>) *this)[index];
+        return ((Slice<T>) *this)[index];
     }
 
     T &operator [](usize index) {
-        return ((core::slice::SliceMut<T>) *this)[index];
+        return ((SliceMut<T>) *this)[index];
     }
 
-    core::slice::Slice<T> operator [](core::ops::RangeFrom<usize> index) const {
-        return ((core::slice::Slice<T>) *this)[index];
+    Slice<T> operator [](core::ops::RangeFrom<usize> index) const {
+        return ((Slice<T>) *this)[index];
     }
 
-    core::slice::SliceMut<T> operator [](core::ops::RangeFrom<usize> index) {
-        return ((core::slice::SliceMut<T>) *this)[index];
+    SliceMut<T> operator [](core::ops::RangeFrom<usize> index) {
+        return ((SliceMut<T>) *this)[index];
     }
 };
 

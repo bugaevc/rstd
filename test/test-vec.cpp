@@ -2,7 +2,6 @@
 #include <rstd/core/macros.hpp>
 using namespace rstd;
 
-using core::slice::Slice;
 using alloc::vec::Vec;
 
 extern "C" int printf(const char *format, ...);

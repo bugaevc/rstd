@@ -34,7 +34,7 @@ Stdout stdout() {
     return Stdout();
 }
 
-Result<usize> Stdout::write(core::slice::Slice<u8> buf) {
+Result<usize> Stdout::write(Slice<u8> buf) {
     isize nwritten = ::write(STDOUT_FILENO, buf.as_ptr(), buf.len());
     if (nwritten < 0) {
         return Err(Error::last_os_error());

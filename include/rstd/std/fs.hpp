@@ -26,7 +26,7 @@ public:
 
     static io::Result<File> open(path::Path path);
 
-    io::Result<usize> read(core::slice::SliceMut<u8> buf);
+    io::Result<usize> read(SliceMut<u8> buf);
 };
 
 }

@@ -85,9 +85,9 @@ protected:
     Read() { }
 
 public:
-    Result<usize> read(core::slice::SliceMut<u8> buf);
+    Result<usize> read(SliceMut<u8> buf);
 
-    Result<UnitType> read_exact(core::slice::SliceMut<u8> buf) {
+    Result<UnitType> read_exact(SliceMut<u8> buf) {
         while (!buf.is_empty()) {
             // TODO: Ignore ErrorKind::Interrupted
             usize nread = try(self().read(buf));
@@ -112,10 +112,10 @@ protected:
     Write() { }
 
 public:
-    Result<usize> write(core::slice::Slice<u8> buf);
+    Result<usize> write(Slice<u8> buf);
     Result<UnitType> flush();
 
-    Result<UnitType> write_all(core::slice::Slice<u8> buf) {
+    Result<UnitType> write_all(Slice<u8> buf) {
         while (!buf.is_empty()) {
             // TODO: Ignore ErrorKind::Interrupted
             usize nwritten = try(self().write(buf));
@@ -140,14 +140,14 @@ protected:
     BufRead() { }
 
 public:
-    Result<core::slice::Slice<u8>> fill_buf();
+    Result<Slice<u8>> fill_buf();
     void consume(usize amount);
 
     Result<usize> read_until(u8 byte, Vec<u8> &buf) {
         usize total_consumed = 0;
         const u8 *p;
         do {
-            core::slice::Slice<u8> ibuf = try(self().fill_buf());
+            Slice<u8> ibuf = try(self().fill_buf());
             if (ibuf.is_empty()) {
                 break;
             }
@@ -186,7 +186,7 @@ public:
         , buf(Vec<u8>::with_capacity(8 * 1024))
     { }
 
-    core::slice::Slice<u8> buffer() const {
+    Slice<u8> buffer() const {
         return buf;
     }
 
@@ -194,8 +194,7 @@ public:
         return buf.capacity();
     }
 
-    Result<core::slice::Slice<u8>> fill_buf() {
-        using core::slice::Slice;
+    Result<Slice<u8>> fill_buf() {
         using core::ops::RangeFrom;
 
         if (consumed < buf.len()) {
@@ -237,7 +236,7 @@ public:
         (void) flush();
     }
 
-    core::slice::Slice<u8> buffer() const {
+    Slice<u8> buffer() const {
         return buf;
     }
 
@@ -245,7 +244,7 @@ public:
         return buf.capacity();
     }
 
-    Result<usize> write(core::slice::Slice<u8> data) {
+    Result<usize> write(Slice<u8> data) {
         usize available_space = buf.capacity() - buf.len();
         if (available_space == 0) {
             try(flush());
@@ -258,7 +257,6 @@ public:
     }
 
     Result<UnitType> flush() {
-        using core::slice::Slice;
         using core::ops::RangeFrom;
 
         usize written_total = 0;
@@ -282,7 +280,7 @@ private:
     friend Stdout stdout();
 
 public:
-    Result<usize> write(core::slice::Slice<u8> buf);
+    Result<usize> write(Slice<u8> buf);
     Result<UnitType> flush();
 };
 

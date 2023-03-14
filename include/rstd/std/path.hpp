@@ -10,7 +10,7 @@ namespace path {
 class Path {
 private:
     // TODO: This should wrap an OStr, not a byte slice
-    core::slice::Slice<u8> bytes;
+    Slice<u8> bytes;
 
 public:
     template<usize len>

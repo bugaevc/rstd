@@ -2,8 +2,6 @@
 #include <rstd/core/macros.hpp>
 using namespace rstd;
 
-using core::slice::Slice;
-
 extern "C" int printf(const char *format, ...);
 
 int main() {
