@@ -21,6 +21,16 @@ template<typename T>
 using remove_reference_t = typename remove_reference<T>::type;
 
 template<typename T>
+struct is_lvalue_reference {
+    constexpr static bool value = false;
+};
+
+template<typename T>
+struct is_lvalue_reference<T &> {
+    constexpr static bool value = true;
+};
+
+template<typename T>
 remove_reference_t<T> &&move(T &&obj) noexcept {
     return (remove_reference_t<T> &&) obj;
 }
@@ -32,6 +42,7 @@ T &&forward(remove_reference_t<T> &obj) noexcept {
 
 template<typename T>
 T &&forward(remove_reference_t<T> &&obj) noexcept {
+    static_assert(!is_lvalue_reference<T>::value);
     return (T &&) obj;
 }
 
